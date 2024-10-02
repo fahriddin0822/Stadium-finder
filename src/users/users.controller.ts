@@ -25,6 +25,9 @@ export class UsersController {
     return this.usersService.signup(createUserDto, res);
   }
 
+  // @Post('activate')
+  // activate()
+
   @Get()
   findAll() {
     return this.usersService.findAll();

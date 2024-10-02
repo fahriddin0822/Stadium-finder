@@ -13,7 +13,7 @@ export class MailService {
         await this.mailerService.sendMail({
             to: user.email,
             subject: "Stadium app ga xush kelibsiz.",
-            template: "./templates/confirm.hbs",
+            template: "./confirm.hbs",
             context: {
                 fullName: user.fullName,
                 url,
