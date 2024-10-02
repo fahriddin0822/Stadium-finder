@@ -13,38 +13,40 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Response, response } from 'express';
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+    constructor(private readonly usersService: UsersService) {}
 
-  @Post('signup')
-  signup(
-    @Body() createUserDto: CreateUserDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    return this.usersService.signup(createUserDto, res);
+    @Post("signup")
+    signup(
+        @Body() createUserDto: CreateUserDto,
+        @Res({ passthrough: true }) res: Response
+    ) {
+        return this.usersService.signup(createUserDto, res);
+    }
+
+    @Get("activate/:activation_link")
+    async activateUser(@Param("activation_link") activation_link: string) {
+        return this.usersService.activateUser(activation_link);
   }
+  
+    @Get()
+    findAll() {
+        return this.usersService.findAll();
+    }
 
-  // @Post('activate')
-  // activate()
+    @Get(":id")
+    findOne(@Param("id") id: string) {
+        return this.usersService.findOne(+id);
+    }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
+    @Patch(":id")
+    update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
+        return this.usersService.update(+id, updateUserDto);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
-  }
+    @Delete(":id")
+    remove(@Param("id") id: string) {
+        return this.usersService.remove(+id);
+    }
 }
