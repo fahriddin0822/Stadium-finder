@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AdminModule } from './admin/admin.module';
 import { DistrictModule } from './district/district.module';
 import { RegionModule } from './region/region.module';
@@ -22,6 +20,8 @@ import { Comfort } from './comfort/models/comfort.model';
 import { Region } from './region/models/region.model';
 import { District } from './district/models/district.model';
 import { Categories } from './categories/models/category.model';
+import { Users } from './users/models/user.model';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -33,7 +33,7 @@ import { Categories } from './categories/models/category.model';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      models: [Comfort, Region, District, Categories],
+      models: [Comfort, Region, District, Categories, Users],
       autoLoadModels: true,
       sync: { alter: true },
       logging: true,
@@ -55,8 +55,9 @@ import { Categories } from './categories/models/category.model';
     StadiumsModule,
     CommentsModule,
     ComfortStadiumModule,
+    MailModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

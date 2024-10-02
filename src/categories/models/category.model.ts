@@ -1,4 +1,12 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  HasMany,
+  Model,
+  Table,
+} from 'sequelize-typescript';
 
 interface ICategoryCreationAttr {
   name: string;
@@ -19,4 +27,7 @@ export class Categories extends Model<Categories, ICategoryCreationAttr> {
 
   @BelongsTo(() => Categories, { foreignKey: 'parentId' })
   parentCategory: Categories; // Reference to parent category
+
+  @HasMany(() => Categories)
+  categories: Categories[];
 }
