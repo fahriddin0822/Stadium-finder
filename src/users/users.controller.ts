@@ -9,11 +9,13 @@ import {
     Res,
     Req,
     BadRequestException,
+    UseGuards,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { Request, Response, response } from "express";
+import { UserGuard } from "../guards/user.guard";
 
 @Controller("users")
 export class UsersController {
@@ -49,7 +51,30 @@ export class UsersController {
         return res.json(result);
     }
 
-    @Get()
+    @Post("signin")
+    async signIn(
+        @Body() credentials: { email: string; password: string },
+        @Res({ passthrough: true }) res: Response
+    ) {
+        const result = await this.usersService.signIn(
+            credentials.email,
+            credentials.password
+        );
+        res.cookie("refresh_token", result.refresh_token, {
+            httpOnly: true,
+            maxAge: +process.env.REFRESH_TIME_MS,
+        });
+        return res.json({ access_token: result.access_token });
+    }
+
+    @Post("signout")
+    signOut(@Res() res: Response) {
+        res.clearCookie("refresh_token"); // Clear the refresh token from the cookie
+        return res.json({ message: "Signed out successfully" });
+    }
+
+    @UseGuards(UserGuard)
+    @Get('all')
     findAll() {
         return this.usersService.findAll();
     }

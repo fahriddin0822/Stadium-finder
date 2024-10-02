@@ -96,7 +96,6 @@ export class UsersService {
             throw new BadRequestException("Invalid refresh token.");
         }
 
-        // Activate the user
         user.is_active = true;
         await user.save();
 
@@ -104,6 +103,23 @@ export class UsersService {
             message: "User successfully activated",
             user,
         };
+    }
+
+    async signIn(email: string, password: string) {
+        const user = await this.usersModel.findOne({ where: { email } });
+
+        if (!user || !(await bcrypt.compare(password, user.hashed_password))) {
+            throw new BadRequestException("Invalid email or password");
+        }
+
+        const tokens = await this.generateTokens(user);
+
+        const hashed_refresh_token = await bcrypt.hash(tokens.refresh_token, 7);
+        await this.usersModel.update(
+            { hashed_refresh_token },
+            { where: { id: user.id } }
+        );
+        return tokens;
     }
 
     async refreshTokens(refreshToken: string) {
