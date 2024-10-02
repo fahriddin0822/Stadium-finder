@@ -1,17 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Res,
-} from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { Response, response } from 'express';
+    Controller,
+    Get,
+    Post,
+    Body,
+    Patch,
+    Param,
+    Delete,
+    Res,
+    Req,
+    BadRequestException,
+} from "@nestjs/common";
+import { UsersService } from "./users.service";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { Request, Response, response } from "express";
 
 @Controller("users")
 export class UsersController {
@@ -26,10 +28,27 @@ export class UsersController {
     }
 
     @Get("activate/:activation_link")
-    async activateUser(@Param("activation_link") activation_link: string) {
-        return this.usersService.activateUser(activation_link);
-  }
-  
+    async activateUser(
+        @Param("activation_link") activation_link: string,
+        @Req() req: Request,
+        @Res() res: Response
+    ) {
+        const refreshToken = req.cookies["refresh_token"];
+
+        if (!refreshToken) {
+            throw new BadRequestException(
+                "No refresh token found in the cookies."
+            );
+        }
+
+        const result = await this.usersService.activateUser(
+            refreshToken,
+            activation_link
+        );
+
+        return res.json(result);
+    }
+
     @Get()
     findAll() {
         return this.usersService.findAll();

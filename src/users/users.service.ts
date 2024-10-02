@@ -78,7 +78,7 @@ export class UsersService {
         return response;
     }
 
-    async activateUser(activation_link: string) {
+    async activateUser(refreshToken: string, activation_link: string) {
         const user = await this.usersModel.findOne({
             where: { activation_link },
         });
@@ -87,16 +87,43 @@ export class UsersService {
             throw new BadRequestException("Invalid activation link.");
         }
 
-        // Activate the user by updating the 'is_active' key
-        user.is_active = true;
+        const isTokenValid = await bcrypt.compare(
+            refreshToken,
+            user.hashed_refresh_token
+        );
 
-        // Save the updated user
+        if (!isTokenValid) {
+            throw new BadRequestException("Invalid refresh token.");
+        }
+
+        // Activate the user
+        user.is_active = true;
         await user.save();
 
         return {
             message: "User successfully activated",
             user,
         };
+    }
+
+    async refreshTokens(refreshToken: string) {
+        const user = await this.validateRefreshToken(refreshToken);
+
+        const newTokens = await this.generateTokens(user);
+
+        return newTokens;
+    }
+
+    private async validateRefreshToken(refreshToken: string) {
+        const user = await this.usersModel.findOne({
+            where: { hashed_refresh_token: refreshToken },
+        });
+
+        if (!user) {
+            throw new BadRequestException("Invalid refresh token");
+        }
+
+        return user;
     }
 
     create(createUserDto: CreateUserDto) {
