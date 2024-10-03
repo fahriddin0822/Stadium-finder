@@ -21,26 +21,26 @@ export class UsersService {
         private readonly mailService: MailService
     ) {}
 
-    async signup(createCategoryDto: CreateUserDto, res: Response) {
+    async signup(createUserDto: CreateUserDto, res: Response) {
         const user = await this.usersModel.findOne({
-            where: { email: createCategoryDto.email },
+            where: { email: createUserDto.email },
         });
 
         if (user) {
             throw new BadRequestException("This user is exist.");
         }
 
-        if (createCategoryDto.password !== createCategoryDto.confirmPassword) {
+        if (createUserDto.password !== createUserDto.confirmPassword) {
             throw new BadRequestException("Password is incorrect.");
         }
 
         const hashed_password = await bcrypt.hash(
-            createCategoryDto.password,
+            createUserDto.password,
             7
         );
 
         const newUser = await this.usersModel.create({
-            ...createCategoryDto,
+            ...createUserDto,
             hashed_password,
         });
 
