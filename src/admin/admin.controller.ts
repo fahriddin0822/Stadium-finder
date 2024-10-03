@@ -103,25 +103,25 @@ export class AdminController {
         }
     }
 
-    // @UseGuards(CreatorGuard)
+    @UseGuards(CreatorGuard)
     @Get("all")
     findAll() {
         return this.adminService.findAll();
     }
 
-    // @UseGuards(AdminGuard)
+    @UseGuards(AdminGuard)
     @Get(":id")
     findOne(@Param("id") id: string) {
         return this.adminService.findOne(+id);
     }
 
-    // @UseGuards(CreatorGuard)
+    @UseGuards(CreatorGuard)
     @Patch(":id")
     update(@Param("id") id: string, @Body() updateAdminDto: UpdateAdminDto) {
         return this.adminService.update(+id, updateAdminDto);
     }
 
-    // @UseGuards(CreatorGuard)
+    @UseGuards(CreatorGuard)
     @Delete(":id")
     remove(@Param("id") id: string) {
         return this.adminService.remove(+id);
