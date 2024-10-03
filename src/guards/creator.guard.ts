@@ -23,7 +23,7 @@ export class CreatorGuard implements CanActivate {
         const payload = this.jwtService.decode(token) as any;
 
         // Check if the user is a creator
-        if (!payload || !payload.is_owner) {
+        if (!payload || !payload.is_creator) {
             throw new ForbiddenException("Access denied. Creators only.");
         }
 
