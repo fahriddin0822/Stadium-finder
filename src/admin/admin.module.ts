@@ -3,8 +3,9 @@ import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Admin } from './models/admin.model';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { MailModule } from '../mail/mail.module';
+import { AdminGuard } from '../guards/admin.guard';
 
 @Module({
     imports: [
@@ -13,6 +14,6 @@ import { MailModule } from '../mail/mail.module';
         MailModule,
     ],
     controllers: [AdminController],
-    providers: [AdminService],
+    providers: [AdminService, JwtService, AdminGuard],
 })
 export class AdminModule {}

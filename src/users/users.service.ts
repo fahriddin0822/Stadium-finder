@@ -34,10 +34,7 @@ export class UsersService {
             throw new BadRequestException("Password is incorrect.");
         }
 
-        const hashed_password = await bcrypt.hash(
-            createUserDto.password,
-            7
-        );
+        const hashed_password = await bcrypt.hash(createUserDto.password, 7);
 
         const newUser = await this.usersModel.create({
             ...createUserDto,
@@ -107,35 +104,64 @@ export class UsersService {
 
     async signIn(email: string, password: string) {
         const user = await this.usersModel.findOne({ where: { email } });
-
+        
         if (!user || !(await bcrypt.compare(password, user.hashed_password))) {
             throw new BadRequestException("Invalid email or password");
         }
-
+        
         const tokens = await this.generateTokens(user);
+        // console.log("Original Refresh Token:", tokens.refresh_token);
 
         const hashed_refresh_token = await bcrypt.hash(tokens.refresh_token, 7);
+        // console.log("Hashed Refresh Token:", hashed_refresh_token);
         await this.usersModel.update(
             { hashed_refresh_token },
             { where: { id: user.id } }
         );
+        // console.log("Tokens:", tokens);
+
         return tokens;
     }
 
     async refreshTokens(refreshToken: string) {
         const user = await this.validateRefreshToken(refreshToken);
 
+        if (!user) {
+            throw new BadRequestException("Invalid refresh token");
+        }
+
         const newTokens = await this.generateTokens(user);
 
-        return newTokens;
+        const hashed_refresh_token = await bcrypt.hash(
+            newTokens.refresh_token,
+            7
+        );
+        await this.usersModel.update(
+            { hashed_refresh_token },
+            { where: { id: user.id } }
+        );
+
+        return {
+            access_token: newTokens.access_token,
+            refresh_token: newTokens.refresh_token,
+        };
     }
 
-    private async validateRefreshToken(refreshToken: string) {
+    async validateRefreshToken(refreshToken: string) {
         const user = await this.usersModel.findOne({
-            where: { hashed_refresh_token: refreshToken },
+            where: { hashed_refresh_token: refreshToken }, // Make sure this lookup is correct
         });
 
         if (!user) {
+            throw new BadRequestException("Invalid refresh token");
+        }
+
+        const isTokenValid = await bcrypt.compare(
+            refreshToken,
+            user.hashed_refresh_token
+        );
+
+        if (!isTokenValid) {
             throw new BadRequestException("Invalid refresh token");
         }
 

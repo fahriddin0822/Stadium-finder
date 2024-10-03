@@ -76,36 +76,37 @@ export class UsersController {
     }
 
     @UseGuards(UserGuard)
-    @Get('all')
+    @Get("all")
     findAll() {
         return this.usersService.findAll();
     }
 
-    @Post('refresh-tokens')
+    @Post("refresh-tokens")
     @HttpCode(HttpStatus.OK)
     async refreshTokens(@Req() req: Request, @Res() res: Response) {
-        const refreshToken = req.cookies['refresh_token']; // Get refresh token from cookie
-
+        const refreshToken = req.cookies["refresh_token"]; // Extract refresh token from cookies
         if (!refreshToken) {
-            return res.status(HttpStatus.FORBIDDEN).json({
-                message: 'Refresh token not found',
-            });
+            return res
+                .status(HttpStatus.FORBIDDEN)
+                .json({ message: "Refresh token not found" });
         }
 
         try {
-            const newTokens = await this.usersService.refreshTokens(refreshToken);
-            res.cookie('refresh_token', newTokens.refresh_token, {
+            const newTokens =
+                await this.usersService.refreshTokens(refreshToken);
+
+            // Set the new refresh token in the cookie
+            res.cookie("refresh_token", newTokens.refresh_token, {
                 httpOnly: true,
-                maxAge: +process.env.REFRESH_TIME_MS,
+                maxAge: +process.env.REFRESH_TIME_MS, // Ensure REFRESH_TIME_MS is valid
             });
 
-            return res.json({
-                access_token: newTokens.access_token,
-            });
+            // Return only the access token and necessary information
+            return res.json({ access_token: newTokens.access_token });
         } catch (error) {
-            return res.status(HttpStatus.FORBIDDEN).json({
-                message: 'Invalid or expired refresh token',
-            });
+            return res
+                .status(HttpStatus.FORBIDDEN)
+                .json({ message: "Invalid or expired refresh token" });
         }
     }
 

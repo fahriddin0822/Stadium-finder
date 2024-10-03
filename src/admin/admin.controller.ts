@@ -11,11 +11,14 @@ import {
     Req,
     HttpCode,
     HttpStatus,
+    UseGuards,
 } from "@nestjs/common";
 import { AdminService } from "./admin.service";
 import { CreateAdminDto } from "./dto/create-admin.dto";
 import { UpdateAdminDto } from "./dto/update-admin.dto";
 import { Request, Response } from "express";
+import { AdminGuard } from "../guards/admin.guard";
+import { CreatorGuard } from "../guards/creator.guard";
 
 @Controller("admin")
 export class AdminController {
@@ -26,6 +29,7 @@ export class AdminController {
         return this.adminService.create(createAdminDto);
     }
 
+    @UseGuards(CreatorGuard)
     @Post("signup")
     signup(
         @Body() createUserDto: CreateAdminDto,
@@ -34,6 +38,7 @@ export class AdminController {
         return this.adminService.signup(createUserDto, res);
     }
 
+    @UseGuards(AdminGuard)
     @Get("activate/:activation_link")
     async activateAdmin(
         @Param("activation_link") activation_link: string,
@@ -61,26 +66,29 @@ export class AdminController {
         return res.json({ access_token: result.access_token });
     }
 
+    @UseGuards(AdminGuard)
     @Post("signout")
     signOut(@Res() res: Response) {
         res.clearCookie("refresh_token"); // Clear the refresh token from the cookie
         return res.json({ message: "Signed out successfully" });
-  }
-  
-    @Post('refresh-tokens')
+    }
+
+    @UseGuards(AdminGuard)
+    @Post("refresh-tokens")
     @HttpCode(HttpStatus.OK)
     async refreshTokens(@Req() req: Request, @Res() res: Response) {
-        const refreshToken = req.cookies['refresh_token']; // Extract refresh token from cookies
+        const refreshToken = req.cookies["refresh_token"]; // Extract refresh token from cookies
 
         if (!refreshToken) {
             return res.status(HttpStatus.FORBIDDEN).json({
-                message: 'Refresh token not found',
+                message: "Refresh token not found",
             });
         }
 
         try {
-            const newTokens = await this.adminService.refreshTokens(refreshToken);
-            res.cookie('refresh_token', newTokens.refresh_token, {
+            const newTokens =
+                await this.adminService.refreshTokens(refreshToken);
+            res.cookie("refresh_token", newTokens.refresh_token, {
                 httpOnly: true,
                 maxAge: +process.env.REFRESH_TIME_MS,
             });
@@ -90,26 +98,30 @@ export class AdminController {
             });
         } catch (error) {
             return res.status(HttpStatus.FORBIDDEN).json({
-                message: 'Invalid or expired refresh token',
+                message: "Invalid or expired refresh token",
             });
         }
     }
 
+    // @UseGuards(CreatorGuard)
     @Get("all")
     findAll() {
         return this.adminService.findAll();
     }
 
+    // @UseGuards(AdminGuard)
     @Get(":id")
     findOne(@Param("id") id: string) {
         return this.adminService.findOne(+id);
     }
 
+    // @UseGuards(CreatorGuard)
     @Patch(":id")
     update(@Param("id") id: string, @Body() updateAdminDto: UpdateAdminDto) {
         return this.adminService.update(+id, updateAdminDto);
     }
 
+    // @UseGuards(CreatorGuard)
     @Delete(":id")
     remove(@Param("id") id: string) {
         return this.adminService.remove(+id);
