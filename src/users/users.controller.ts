@@ -10,11 +10,13 @@ import {
     Req,
     BadRequestException,
     UseGuards,
+    HttpStatus,
+    HttpCode,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { Request, Response, response } from "express";
+import { Request, Response } from "express";
 import { UserGuard } from "../guards/user.guard";
 
 @Controller("users")
@@ -77,6 +79,34 @@ export class UsersController {
     @Get('all')
     findAll() {
         return this.usersService.findAll();
+    }
+
+    @Post('refresh-tokens')
+    @HttpCode(HttpStatus.OK)
+    async refreshTokens(@Req() req: Request, @Res() res: Response) {
+        const refreshToken = req.cookies['refresh_token']; // Get refresh token from cookie
+
+        if (!refreshToken) {
+            return res.status(HttpStatus.FORBIDDEN).json({
+                message: 'Refresh token not found',
+            });
+        }
+
+        try {
+            const newTokens = await this.usersService.refreshTokens(refreshToken);
+            res.cookie('refresh_token', newTokens.refresh_token, {
+                httpOnly: true,
+                maxAge: +process.env.REFRESH_TIME_MS,
+            });
+
+            return res.json({
+                access_token: newTokens.access_token,
+            });
+        } catch (error) {
+            return res.status(HttpStatus.FORBIDDEN).json({
+                message: 'Invalid or expired refresh token',
+            });
+        }
     }
 
     @Get(":id")

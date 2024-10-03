@@ -120,6 +120,12 @@ export class AdminService {
 
         const newTokens = await this.generateTokens(admin);
 
+        const hashed_refresh_token = await bcrypt.hash(newTokens.refresh_token, 7);
+        await this.adminModel.update(
+            { hashed_refresh_token },
+            { where: { id: admin.id } }
+        );
+
         return newTokens;
     }
 

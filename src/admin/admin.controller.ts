@@ -9,6 +9,8 @@ import {
     Res,
     BadRequestException,
     Req,
+    HttpCode,
+    HttpStatus,
 } from "@nestjs/common";
 import { AdminService } from "./admin.service";
 import { CreateAdminDto } from "./dto/create-admin.dto";
@@ -65,7 +67,33 @@ export class AdminController {
         return res.json({ message: "Signed out successfully" });
   }
   
-  
+    @Post('refresh-tokens')
+    @HttpCode(HttpStatus.OK)
+    async refreshTokens(@Req() req: Request, @Res() res: Response) {
+        const refreshToken = req.cookies['refresh_token']; // Extract refresh token from cookies
+
+        if (!refreshToken) {
+            return res.status(HttpStatus.FORBIDDEN).json({
+                message: 'Refresh token not found',
+            });
+        }
+
+        try {
+            const newTokens = await this.adminService.refreshTokens(refreshToken);
+            res.cookie('refresh_token', newTokens.refresh_token, {
+                httpOnly: true,
+                maxAge: +process.env.REFRESH_TIME_MS,
+            });
+
+            return res.json({
+                access_token: newTokens.access_token,
+            });
+        } catch (error) {
+            return res.status(HttpStatus.FORBIDDEN).json({
+                message: 'Invalid or expired refresh token',
+            });
+        }
+    }
 
     @Get("all")
     findAll() {
