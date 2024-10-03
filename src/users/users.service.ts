@@ -1,5 +1,6 @@
 import {
     BadRequestException,
+    ForbiddenException,
     Injectable,
     InternalServerErrorException,
 } from "@nestjs/common";
@@ -10,8 +11,11 @@ import * as uuid from "uuid";
 import { InjectModel } from "@nestjs/sequelize";
 import { Users } from "./models/user.model";
 import { JwtService } from "@nestjs/jwt";
-import { Response } from "express";
+import { response, Response } from "express";
 import { MailService } from "../mail/mail.service";
+import { access, link } from "fs";
+import { where } from "sequelize";
+import { SignInUserDto } from "./dto/signInUser.dto";
 
 @Injectable()
 export class UsersService {
@@ -75,79 +79,151 @@ export class UsersService {
         return response;
     }
 
-    async activateUser(refreshToken: string, activation_link: string) {
-        const user = await this.usersModel.findOne({
-            where: { activation_link },
-        });
+    async activateUser(activation_link: string) {
+        if (!activation_link) {
+            throw new BadRequestException("Activation link not found.");
+        }
+        const updateUser = await this.usersModel.update(
+            { is_active: true },
+            {
+                where: {
+                    activation_link: activation_link,
+                    is_active: false,
+                },
+                returning: true,
+            }
+        );
 
-        if (!user) {
-            throw new BadRequestException("Invalid activation link.");
+        if (!updateUser[1][0]) {
+            throw new BadRequestException("User already activated.");
         }
 
-        const isTokenValid = await bcrypt.compare(
-            refreshToken,
+        const response = {
+            message: "User activated successfully.",
+            user: updateUser[1][0].is_active,
+        };
+        return response;
+    }
+
+    async signIn(signInUserDto: SignInUserDto, res: Response) {
+        const { email, password } = signInUserDto;
+        const user = await this.usersModel.findOne({ where: { email } });
+
+        if (!user) {
+            throw new BadRequestException("User not found");
+        }
+
+        if (!user.is_active) {
+            throw new BadRequestException("User is not activated.");
+        }
+
+        const isMatchPass = await bcrypt.compare(
+            password,
+            user.hashed_password
+        );
+
+        if (!isMatchPass) {
+            throw new BadRequestException("Passeord do not matched.");
+        }
+        const tokens = await this.generateTokens(user);
+
+        const hashed_refresh_token = await bcrypt.hash(tokens.refresh_token, 7);
+
+        const updatedUser = await this.usersModel.update(
+            { hashed_refresh_token },
+            {
+                where: { id: user.id },
+                returning: true,
+            }
+        );
+
+        res.cookie("refresh_token", tokens.refresh_token, {
+            httpOnly: true,
+            maxAge: +process.env.REFRESH_TIME_MS,
+        });
+
+        const response = {
+            message: "User signed in",
+            user: updatedUser[1][0],
+            accessToken: tokens.access_token,
+        };
+        return response;
+    }
+
+    async signout(refresh_token: string, res: Response) {
+        console.log("REFRESH_TOKEN_KEY", process.env.REFRESH_TOKEN_KEY);
+        const userData = await this.jwtService.verify(refresh_token, {
+            secret: process.env.REFRESH_TOKEN_KEY,
+        });
+
+        if (!userData) {
+            throw new ForbiddenException("User not verified");
+        }
+
+        const updateUser = await this.usersModel.update(
+            {
+                hashed_refresh_token: null,
+            },
+            {
+                where: { id: userData.id },
+                returning: true,
+            }
+        );
+        res.clearCookie("refresh_token");
+        const respoonse = {
+            message: "User signed out successfully.",
+        };
+        return response;
+    }
+
+    async refreshTokens(userId: number, refresh_token: string, res: Response) {
+        const decodedToken = await this.jwtService.decode(refresh_token);
+
+        if (userId != decodedToken["id"]) {
+            throw new BadRequestException("Ruxsat etilmagan");
+        }
+
+        const user = await this.usersModel.findOne({ where: { id: userId } });
+
+        if (!user || !user.hashed_refresh_token) {
+            throw new BadRequestException("User not found.");
+        }
+
+        const tokenMatch = await bcrypt.compare(
+            refresh_token,
             user.hashed_refresh_token
         );
 
-        if (!isTokenValid) {
-            throw new BadRequestException("Invalid refresh token.");
+        if (!tokenMatch) {
+            throw new ForbiddenException("Forbidden.");
         }
 
-        user.is_active = true;
-        await user.save();
-
-        return {
-            message: "User successfully activated",
-            user,
-        };
-    }
-
-    async signIn(email: string, password: string) {
-        const user = await this.usersModel.findOne({ where: { email } });
-        
-        if (!user || !(await bcrypt.compare(password, user.hashed_password))) {
-            throw new BadRequestException("Invalid email or password");
-        }
-        
         const tokens = await this.generateTokens(user);
-        // console.log("Original Refresh Token:", tokens.refresh_token);
 
         const hashed_refresh_token = await bcrypt.hash(tokens.refresh_token, 7);
-        // console.log("Hashed Refresh Token:", hashed_refresh_token);
-        await this.usersModel.update(
-            { hashed_refresh_token },
-            { where: { id: user.id } }
+
+        const updatedUser = await this.usersModel.update(
+            {
+                hashed_refresh_token,
+            },
+            {
+                where: { id: user.id },
+                returning: true,
+            }
         );
-        // console.log("Tokens:", tokens);
-
-        return tokens;
-    }
-
-    async refreshTokens(refreshToken: string) {
-        const user = await this.validateRefreshToken(refreshToken);
-
-        if (!user) {
-            throw new BadRequestException("Invalid refresh token");
-        }
-
-        const newTokens = await this.generateTokens(user);
-
-        const hashed_refresh_token = await bcrypt.hash(
-            newTokens.refresh_token,
-            7
-        );
-        await this.usersModel.update(
-            { hashed_refresh_token },
-            { where: { id: user.id } }
-        );
-
-        return {
-            access_token: newTokens.access_token,
-            refresh_token: newTokens.refresh_token,
+        res.cookie("refresh_token", tokens.refresh_token, {
+            maxAge: +process.env.REFRESH_TIME_MS,
+            httpOnly: true,
+        });
+        const response = {
+            message: "User refreshed.",
+            user: updatedUser[1][0],
+            access_token: tokens.access_token,
         };
+        return response;
     }
 
-    async validateRefreshToken(refreshToken: string) {
+    async validateRefreshTokens(refreshToken: string) {
         const user = await this.usersModel.findOne({
             where: { hashed_refresh_token: refreshToken }, // Make sure this lookup is correct
         });

@@ -18,6 +18,8 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { Request, Response } from "express";
 import { UserGuard } from "../guards/user.guard";
+import { SignInUserDto } from "./dto/signInUser.dto";
+import { CookieGetter } from "../decorators/cookie_getter.decorator";
 
 @Controller("users")
 export class UsersController {
@@ -32,47 +34,27 @@ export class UsersController {
     }
 
     @Get("activate/:activation_link")
-    async activateUser(
-        @Param("activation_link") activation_link: string,
-        @Req() req: Request,
-        @Res() res: Response
-    ) {
-        const refreshToken = req.cookies["refresh_token"];
-
-        if (!refreshToken) {
-            throw new BadRequestException(
-                "No refresh token found in the cookies."
-            );
-        }
-
-        const result = await this.usersService.activateUser(
-            refreshToken,
-            activation_link
-        );
-
-        return res.json(result);
+    async activateUser(@Param("activation_link") activation_link: string) {
+        return this.usersService.activateUser(activation_link);
     }
 
+    @HttpCode(200)
     @Post("signin")
     async signIn(
-        @Body() credentials: { email: string; password: string },
+        @Body() signInUserDto: SignInUserDto,
         @Res({ passthrough: true }) res: Response
     ) {
-        const result = await this.usersService.signIn(
-            credentials.email,
-            credentials.password
-        );
-        res.cookie("refresh_token", result.refresh_token, {
-            httpOnly: true,
-            maxAge: +process.env.REFRESH_TIME_MS,
-        });
-        return res.json({ access_token: result.access_token });
+        const result = await this.usersService.signIn(signInUserDto, res);
+        return result;
     }
 
+    @HttpCode(200)
     @Post("signout")
-    signOut(@Res() res: Response) {
-        res.clearCookie("refresh_token"); // Clear the refresh token from the cookie
-        return res.json({ message: "Signed out successfully" });
+    signOut(
+        @CookieGetter("refresh_token") refreshToken: string,
+        @Res({ passthrough: true }) res: Response
+    ) {
+        return this.usersService.signout(refreshToken, res);
     }
 
     @UseGuards(UserGuard)
@@ -81,33 +63,14 @@ export class UsersController {
         return this.usersService.findAll();
     }
 
-    @Post("refresh-tokens")
-    @HttpCode(HttpStatus.OK)
-    async refreshTokens(@Req() req: Request, @Res() res: Response) {
-        const refreshToken = req.cookies["refresh_token"]; // Extract refresh token from cookies
-        if (!refreshToken) {
-            return res
-                .status(HttpStatus.FORBIDDEN)
-                .json({ message: "Refresh token not found" });
-        }
-
-        try {
-            const newTokens =
-                await this.usersService.refreshTokens(refreshToken);
-
-            // Set the new refresh token in the cookie
-            res.cookie("refresh_token", newTokens.refresh_token, {
-                httpOnly: true,
-                maxAge: +process.env.REFRESH_TIME_MS, // Ensure REFRESH_TIME_MS is valid
-            });
-
-            // Return only the access token and necessary information
-            return res.json({ access_token: newTokens.access_token });
-        } catch (error) {
-            return res
-                .status(HttpStatus.FORBIDDEN)
-                .json({ message: "Invalid or expired refresh token" });
-        }
+    @HttpCode(200)
+    @Post(":id/refresh")
+    refresh(
+        @Param("id") id: number,
+        @CookieGetter("refresh_token") refreshToken: string,
+        @Res({ passthrough: true }) res: Response
+    ) {
+        return this.usersService.refreshTokens(+id, refreshToken, res);
     }
 
     @Get(":id")
