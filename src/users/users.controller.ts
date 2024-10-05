@@ -58,7 +58,7 @@ export class UsersController {
     }
 
     @UseGuards(UserGuard)
-    @Get("all")
+    @Get("all")          
     findAll() {
         return this.usersService.findAll();
     }

@@ -219,4 +219,25 @@ export class BotService {
             }
         }
     }
+    // try {
+        
+    // } catch (error) {
+        
+    // }
+
+    // async sendOtp(phone_number: string, OTP: string):Promise<boolean> {
+    //     const user = this.botModel.findOne({ where: { phone_number } });
+    //     if (!user || !user.status) {
+    //         return false
+    //     }
+    
+
+    //     await this.bot.telegram.sendMessage(user.userId, )
+    // }
+
+
+
+    
+
+
 }

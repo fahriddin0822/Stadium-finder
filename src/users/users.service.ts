@@ -16,13 +16,15 @@ import { MailService } from "../mail/mail.service";
 import { access, link } from "fs";
 import { where } from "sequelize";
 import { SignInUserDto } from "./dto/signInUser.dto";
+import { OTP } from "../otp/models/otp.model";
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectModel(Users) private usersModel: typeof Users,
         private readonly jwtService: JwtService,
-        private readonly mailService: MailService
+        private readonly mailService: MailService,
+        @InjectModel(OTP) private otpModel: typeof OTP
     ) {}
 
     async signup(createUserDto: CreateUserDto, res: Response) {
@@ -78,6 +80,50 @@ export class UsersService {
         };
         return response;
     }
+
+    // newOTP = async () => async (phone_number: string) => {
+    //     const otp = Math.floor(100000 + Math.random() * 900000);
+    //     const expiration_time = new Date();
+    //     expiration_time.setMinutes(expiration_time.getMinutes() + 15);
+    //     const existingOTP = await this.otpModel.findOne({
+    //         where: { phone_number },
+    //     });
+    //     if (existingOTP) {
+    //         await this.otpModel.update(
+    //             { otp, expiration_time },
+    //             { where: { phone_number } }
+    //         );
+    //     } else {
+    //         await this.otpModel.create({
+    //             id: phone_number,
+    //             otp,
+    //             expiration_time,
+    //             verified: false,
+    //             phone_number,
+    //         });
+    //     }
+    //     return otp;
+    //     // send OTP via SMS or email
+    //     // return otp;
+    // };
+    // async verifyOTP(phone_number: string, otp: string) {
+    //     const existingOTP = await this.otpModel.findOne({
+    //         where: { phone_number, verified: false },
+    //     });
+    //     if (!existingOTP) {
+    //         throw new BadRequestException("Invalid OTP.");
+    //     }
+    //     if (existingOTP.otp !== otp) {
+    //         throw new BadRequestException("Invalid OTP.");
+    //     }
+    //     await this.otpModel.update(
+    //         { verified: true },
+    //         { where: { phone_number, verified: false } }
+    //     );
+    //     return true;
+    //     // verify OTP and update user is_active to true
+    //     // send welcome email or message
+    // }
 
     async activateUser(activation_link: string) {
         if (!activation_link) {
