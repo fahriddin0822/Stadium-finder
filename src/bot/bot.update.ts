@@ -119,69 +119,69 @@ export class BotUpdate {
     }
 
 
-    // @Command("inline")
-    // async inline(@Ctx() ctx: Context) {
-    //     const inlineKeyboard = [
-    //         [
-    //             {
-    //                 text: "Button 1",
-    //                 callback_data: "button1",
-    //             },
-    //             {
-    //                 text: "Button 2",
-    //                 callback_data: "button2",
-    //             },
-    //             {
-    //                 text: "Button 3",
-    //                 callback_data: "button3",
-    //             },
-    //         ],
-    //         [
-    //             {
-    //                 text: "Button 4",
-    //                 callback_data: "button4",
-    //             },
-    //             {
-    //                 text: "Button 5",
-    //                 callback_data: "button5",
-    //             },
-    //         ],
-    //         [
-    //             {
-    //                 text: "Button 6",
-    //                 callback_data: "button6",
-    //             },
-    //         ],
-    //     ];
-    //     await ctx.reply("Kerakli inline buttonni tanla: ", {
-    //         reply_markup: {
-    //             inline_keyboard: inlineKeyboard,
-    //         },
-    //     });
-    // }
+    @Command("inline")
+    async inline(@Ctx() ctx: Context) {
+        const inlineKeyboard = [
+            [
+                {
+                    text: "Button 1",
+                    callback_data: "button1",
+                },
+                {
+                    text: "Button 2",
+                    callback_data: "button2",
+                },
+                {
+                    text: "Button 3",
+                    callback_data: "button3",
+                },
+            ],
+            [
+                {
+                    text: "Button 4",
+                    callback_data: "button4",
+                },
+                {
+                    text: "Button 5",
+                    callback_data: "button5",
+                },
+            ],
+            [
+                {
+                    text: "Button 6",
+                    callback_data: "button6",
+                },
+            ],
+        ];
+        await ctx.reply("Kerakli inline buttonni tanla: ", {
+            reply_markup: {
+                inline_keyboard: inlineKeyboard,
+            },
+        });
+    }
 
-    // @Action(/button+[1-9]/)
-    // async onClickAnyButton(@Ctx() ctx: Context) {
-    //     const buttonData = ctx.callbackQuery.chat_instance;
-    //     await ctx.reply(`Ixtiyoriy ${buttonData} Button  tugmasi bosildi!`);
-    // }
+    @Action(/button+[1-9]/)
+    async onClickAnyButton(@Ctx() ctx: Context) {
+        const buttonData = ctx.callbackQuery.chat_instance;
+        await ctx.reply(`Ixtiyoriy ${buttonData} Button  tugmasi bosildi!`);
+    }
 
-    // @Command("main")
-    // async mainButtons(@Ctx() ctx: Context) {
-    //   await ctx.reply("Kerakli Main Buttonni tanla:", {
-    //     parse_mode: "HTML",
-    //     ...Markup.keyboard([
-    //       ["bir", "ikki", "uch"],
-    //       ["to'rt", "besh"],
-    //       ["boshqa"],
-    //       [Markup.button.contactRequest("📱Telefon raqamni yuboring")],
-    //       [Markup.button.locationRequest("📍 Lokatsiyani yuboring")],
-    //       [Markup.button.game("🎮 oyinni yuboring")],
-    //     ])
-    //       .resize()
-    //       .oneTime(),
-    //   });
-    // }
+    @Command("main")
+    async mainButtons(@Ctx() ctx: Context) {
+        await ctx.reply("Kerakli Main Buttonni tanla:", {
+            parse_mode: "HTML",
+            ...Markup.keyboard([
+                ["bir", "ikki", "uch"],
+                ["to'rt", "besh"],
+                ["boshqa"],
+                [Markup.button.contactRequest("📱Telefon raqamni yuboring")],
+                [Markup.button.locationRequest("📍 Lokatsiyani yuboring")],
+                [Markup.button.game("🎮 oyinni yuboring")],
+            ])
+                .resize()
+                .oneTime(),
+        });
+    }
 
     @On("text")
     async onText(@Ctx() ctx: Context) {

@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -47,6 +58,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.BotUpdate = void 0;
 var nestjs_telegraf_1 = require("nestjs-telegraf");
+var telegraf_1 = require("telegraf");
 var BotUpdate = /** @class */ (function () {
     function BotUpdate(botService) {
         this.botService = botService;
@@ -249,67 +261,92 @@ var BotUpdate = /** @class */ (function () {
             });
         });
     };
-    // @Command("inline")
-    // async inline(@Ctx() ctx: Context) {
-    //     const inlineKeyboard = [
-    //         [
-    //             {
-    //                 text: "Button 1",
-    //                 callback_data: "button1",
-    //             },
-    //             {
-    //                 text: "Button 2",
-    //                 callback_data: "button2",
-    //             },
-    //             {
-    //                 text: "Button 3",
-    //                 callback_data: "button3",
-    //             },
-    //         ],
-    //         [
-    //             {
-    //                 text: "Button 4",
-    //                 callback_data: "button4",
-    //             },
-    //             {
-    //                 text: "Button 5",
-    //                 callback_data: "button5",
-    //             },
-    //         ],
-    //         [
-    //             {
-    //                 text: "Button 6",
-    //                 callback_data: "button6",
-    //             },
-    //         ],
-    //     ];
-    //     await ctx.reply("Kerakli inline buttonni tanla: ", {
-    //         reply_markup: {
-    //             inline_keyboard: inlineKeyboard,
-    //         },
-    //     });
-    // }
-    // @Action(/button+[1-9]/)
-    // async onClickAnyButton(@Ctx() ctx: Context) {
-    //     const buttonData = ctx.callbackQuery.chat_instance;
-    //     await ctx.reply(`Ixtiyoriy ${buttonData} Button  tugmasi bosildi!`);
-    // }
-    // @Command("main")
-    // async mainButtons(@Ctx() ctx: Context) {
-    //   await ctx.reply("Kerakli Main Buttonni tanla:", {
-    //     parse_mode: "HTML",
-    //     ...Markup.keyboard([
-    //       ["bir", "ikki", "uch"],
-    //       ["to'rt", "besh"],
-    //       ["boshqa"],
-    //       [Markup.button.contactRequest("📱Telefon raqamni yuboring")],
-    //       [Markup.button.locationRequest("📍 Lokatsiyani yuboring")],
-    //       [Markup.button.game("🎮 oyinni yuboring")],
-    //     ])
-    //       .resize()
-    //       .oneTime(),
-    //   });
-    // }
+    BotUpdate.prototype.inline = function (ctx) {
+        return __awaiter(this, void 0, void 0, function () {
+            var inlineKeyboard;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        inlineKeyboard = [
+                            [
+                                {
+                                    text: "Button 1",
+                                    callback_data: "button1"
+                                },
+                                {
+                                    text: "Button 2",
+                                    callback_data: "button2"
+                                },
+                                {
+                                    text: "Button 3",
+                                    callback_data: "button3"
+                                },
+                            ],
+                            [
+                                {
+                                    text: "Button 4",
+                                    callback_data: "button4"
+                                },
+                                {
+                                    text: "Button 5",
+                                    callback_data: "button5"
+                                },
+                            ],
+                            [
+                                {
+                                    text: "Button 6",
+                                    callback_data: "button6"
+                                },
+                            ],
+                        ];
+                        return [4 /*yield*/, ctx.reply("Kerakli inline buttonni tanla: ", {
+                                reply_markup: {
+                                    inline_keyboard: inlineKeyboard
+                                }
+                            })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BotUpdate.prototype.onClickAnyButton = function (ctx) {
+        return __awaiter(this, void 0, void 0, function () {
+            var buttonData;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        buttonData = ctx.callbackQuery.chat_instance;
+                        return [4 /*yield*/, ctx.reply("Ixtiyoriy " + buttonData + " Button  tugmasi bosildi!")];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BotUpdate.prototype.mainButtons = function (ctx) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, ctx.reply("Kerakli Main Buttonni tanla:", __assign({ parse_mode: "HTML" }, telegraf_1.Markup.keyboard([
+                            ["bir", "ikki", "uch"],
+                            ["to'rt", "besh"],
+                            ["boshqa"],
+                            [telegraf_1.Markup.button.contactRequest("📱Telefon raqamni yuboring")],
+                            [telegraf_1.Markup.button.locationRequest("📍 Lokatsiyani yuboring")],
+                            [telegraf_1.Markup.button.game("🎮 oyinni yuboring")],
+                        ])
+                            .resize()
+                            .oneTime()))];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     BotUpdate.prototype.onText = function (ctx) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -393,6 +430,18 @@ var BotUpdate = /** @class */ (function () {
         nestjs_telegraf_1.Command("help"),
         __param(0, nestjs_telegraf_1.Ctx())
     ], BotUpdate.prototype, "hearsHelp");
+    __decorate([
+        nestjs_telegraf_1.Command("inline"),
+        __param(0, nestjs_telegraf_1.Ctx())
+    ], BotUpdate.prototype, "inline");
+    __decorate([
+        nestjs_telegraf_1.Action(/button+[1-9]/),
+        __param(0, nestjs_telegraf_1.Ctx())
+    ], BotUpdate.prototype, "onClickAnyButton");
+    __decorate([
+        nestjs_telegraf_1.Command("main"),
+        __param(0, nestjs_telegraf_1.Ctx())
+    ], BotUpdate.prototype, "mainButtons");
     __decorate([
         nestjs_telegraf_1.On("text"),
         __param(0, nestjs_telegraf_1.Ctx())
