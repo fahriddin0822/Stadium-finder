@@ -29,6 +29,8 @@ import { Admin } from "./admin/models/admin.model";
 import { Bot } from "./bot/models/bot.model";
 import { OtpModule } from './otp/otp.module';
 import { OTP } from "./otp/models/otp.model";
+import { UserWallet } from "./user_wallet/models/user_wallet.model";
+import { OwnerModule } from './owner/owner.module';
 
 @Module({
     imports: [
@@ -56,7 +58,7 @@ import { OTP } from "./otp/models/otp.model";
             username: process.env.POSTGRES_USER,
             password: process.env.POSTGRES_PASSWORD,
             database: process.env.POSTGRES_DB,
-            models: [Comfort, Region, District, Categories, Users, Admin, Bot, OTP],
+            models: [Comfort, Region, District, Categories, Users, Admin, Bot, OTP, UserWallet],
             autoLoadModels: true,
             sync: { alter: true },
             logging: true,
@@ -81,6 +83,7 @@ import { OTP } from "./otp/models/otp.model";
         MailModule,
         BotModule,
         OtpModule,
+        OwnerModule,
     ],
     controllers: [],
     providers: [],

@@ -1,1 +1,4 @@
-export class CreateUserWalletDto {}
+export class CreateUserWalletDto {
+    user_id: number;
+    wallet: number;
+}

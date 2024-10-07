@@ -38,6 +38,7 @@ var admin_model_1 = require("./admin/models/admin.model");
 var bot_model_1 = require("./bot/models/bot.model");
 var otp_module_1 = require("./otp/otp.module");
 var otp_model_1 = require("./otp/models/otp.model");
+var user_wallet_model_1 = require("./user_wallet/models/user_wallet.model");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -68,7 +69,7 @@ var AppModule = /** @class */ (function () {
                     username: process.env.POSTGRES_USER,
                     password: process.env.POSTGRES_PASSWORD,
                     database: process.env.POSTGRES_DB,
-                    models: [comfort_model_1.Comfort, region_model_1.Region, district_model_1.District, category_model_1.Categories, user_model_1.Users, admin_model_1.Admin, bot_model_1.Bot, otp_model_1.OTP],
+                    models: [comfort_model_1.Comfort, region_model_1.Region, district_model_1.District, category_model_1.Categories, user_model_1.Users, admin_model_1.Admin, bot_model_1.Bot, otp_model_1.OTP, user_wallet_model_1.UserWallet],
                     autoLoadModels: true,
                     sync: { alter: true },
                     logging: true,
