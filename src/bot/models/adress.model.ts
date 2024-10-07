@@ -9,10 +9,10 @@ import {
 import { Bot } from "./bot.model";
 
 interface IAddressCreationAttr {
-    addrss_name: string;
-    addrss: string;
+    userId: number;
+    address_name: string;
+    address: string;
     location: string;
-    user_id: number;
     last_state: string;
 }
 
@@ -25,11 +25,11 @@ export class Address extends Model<Address, IAddressCreationAttr> {
     })
     id: number;
 
-    // @ForeignKey(() => Bot)
+    @ForeignKey(() => Bot)
     @Column({
         type: DataType.BIGINT,
     })
-    user_id: number;
+    userId: number;
 
     @Column({ type: DataType.STRING })
     address_name: string;
@@ -43,8 +43,8 @@ export class Address extends Model<Address, IAddressCreationAttr> {
     @Column({
         type: DataType.STRING,
     })
-    last_state: string;
-
-    // @BelongsTo(() => Bot)
-    // bot: Bot;
+    last_state:string
+    
+    @BelongsTo(() => Bot)
+    bot: Bot;
 }

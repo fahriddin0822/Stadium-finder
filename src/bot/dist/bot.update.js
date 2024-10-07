@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -58,7 +47,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.BotUpdate = void 0;
 var nestjs_telegraf_1 = require("nestjs-telegraf");
-var telegraf_1 = require("telegraf");
 var BotUpdate = /** @class */ (function () {
     function BotUpdate(botService) {
         this.botService = botService;
@@ -67,102 +55,100 @@ var BotUpdate = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, ctx.reply("Bot ishga tushdi.")];
+                    case 0: return [4 /*yield*/, this.botService.start(ctx)];
                     case 1:
-                        _a.sent();
-                        return [4 /*yield*/, this.botService.start(ctx)];
-                    case 2:
                         _a.sent();
                         return [2 /*return*/];
                 }
             });
         });
     };
-    BotUpdate.prototype.onPhoto = function (ctx) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!("photo" in ctx.message)) return [3 /*break*/, 2];
-                        console.log(ctx.message.photo);
-                        return [4 /*yield*/, ctx.replyWithPhoto(String(ctx.message.photo[ctx.message.photo.length - 1].file_id))];
-                    case 1:
-                        _a.sent();
-                        _a.label = 2;
-                    case 2: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    BotUpdate.prototype.onVideo = function (ctx) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!("video" in ctx.message)) return [3 /*break*/, 2];
-                        console.log(ctx.message.video);
-                        return [4 /*yield*/, ctx.replyWithVideo(String(ctx.message.video.file_name))];
-                    case 1:
-                        _a.sent();
-                        _a.label = 2;
-                    case 2: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    BotUpdate.prototype.onSticker = function (ctx) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!("sticker" in ctx.message)) return [3 /*break*/, 2];
-                        console.log(ctx.message.sticker);
-                        return [4 /*yield*/, ctx.reply("👌👌👌")];
-                    case 1:
-                        _a.sent();
-                        _a.label = 2;
-                    case 2: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    BotUpdate.prototype.onAnimation = function (ctx) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!("animation" in ctx.message)) return [3 /*break*/, 2];
-                        console.log(ctx.message.animation);
-                        return [4 /*yield*/, ctx.reply(String(ctx.message.animation.duration))];
-                    case 1:
-                        _a.sent();
-                        _a.label = 2;
-                    case 2: return [2 /*return*/];
-                }
-            });
-        });
-    };
+    // @On("photo")
+    // async onPhoto(@Ctx() ctx: Context) {
+    //     if ("photo" in ctx.message) {
+    //         console.log(ctx.message.photo);
+    //         await ctx.replyWithPhoto(
+    //             String(ctx.message.photo[ctx.message.photo.length - 1].file_id)
+    //         );
+    //     }
+    // }
+    // @On("video")
+    // async onVideo(@Ctx() ctx: Context) {
+    //     if ("video" in ctx.message) {
+    //         console.log(ctx.message.video);
+    //         await ctx.replyWithVideo(String(ctx.message.video.file_name));
+    //     }
+    // }
+    // @On("sticker")
+    // async onSticker(@Ctx() ctx: Context) {
+    //     if ("sticker" in ctx.message) {
+    //         console.log(ctx.message.sticker);
+    //         await ctx.reply("👌👌👌");
+    //     }
+    // }
+    // @On("animation")
+    // async onAnimation(@Ctx() ctx: Context) {
+    //     if ("animation" in ctx.message) {
+    //         console.log(ctx.message.animation);
+    //         await ctx.reply(String(ctx.message.animation.duration));
+    //     }
+    // }
     BotUpdate.prototype.onContact = function (ctx) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        if (!("contact" in ctx.message)) return [3 /*break*/, 5];
-                        console.log(ctx.message.contact);
-                        return [4 /*yield*/, ctx.reply(String(ctx.message.contact.first_name))];
+                    case 0: return [4 /*yield*/, this.botService.onContact(ctx)];
                     case 1:
                         _a.sent();
-                        return [4 /*yield*/, ctx.reply(String(ctx.message.contact.last_name))];
-                    case 2:
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BotUpdate.prototype.onStop = function (ctx) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.botService.onStop(ctx)];
+                    case 1:
                         _a.sent();
-                        return [4 /*yield*/, ctx.reply(String(ctx.message.contact.phone_number))];
-                    case 3:
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BotUpdate.prototype.onAdress = function (ctx) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.botService.onAddress(ctx)];
+                    case 1:
                         _a.sent();
-                        return [4 /*yield*/, ctx.reply(String(ctx.message.contact.user_id))];
-                    case 4:
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BotUpdate.prototype.addNewAddress = function (ctx) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.botService.addNewAddress(ctx)];
+                    case 1:
                         _a.sent();
-                        _a.label = 5;
-                    case 5: return [2 /*return*/];
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    BotUpdate.prototype.showAddresses = function (ctx) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.botService.showAddresses(ctx)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });
@@ -171,77 +157,7 @@ var BotUpdate = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        if (!("location" in ctx.message)) return [3 /*break*/, 4];
-                        console.log(ctx.message.location);
-                        return [4 /*yield*/, ctx.reply(String(ctx.message.location.latitude))];
-                    case 1:
-                        _a.sent();
-                        return [4 /*yield*/, ctx.reply(String(ctx.message.location.longitude))];
-                    case 2:
-                        _a.sent();
-                        return [4 /*yield*/, ctx.replyWithLocation(ctx.message.location.longitude, ctx.message.location.latitude)];
-                    case 3:
-                        _a.sent();
-                        _a.label = 4;
-                    case 4: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    BotUpdate.prototype.onVoice = function (ctx) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!("voice" in ctx.message)) return [3 /*break*/, 2];
-                        console.log(ctx.message.voice);
-                        return [4 /*yield*/, ctx.reply(String(ctx.message.voice.duration))];
-                    case 1:
-                        _a.sent();
-                        _a.label = 2;
-                    case 2: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    BotUpdate.prototype.onInVoice = function (ctx) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!("invoice" in ctx.message)) return [3 /*break*/, 2];
-                        console.log(ctx.message.invoice);
-                        return [4 /*yield*/, ctx.reply(String(ctx.message.invoice))];
-                    case 1:
-                        _a.sent();
-                        _a.label = 2;
-                    case 2: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    BotUpdate.prototype.onDocument = function (ctx) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!("document" in ctx.message)) return [3 /*break*/, 2];
-                        console.log(ctx.message.document);
-                        return [4 /*yield*/, ctx.reply(String(ctx.message.document.file_name))];
-                    case 1:
-                        _a.sent();
-                        _a.label = 2;
-                    case 2: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    BotUpdate.prototype.hearsHi = function (ctx) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, ctx.reply("Hi there!")];
+                    case 0: return [4 /*yield*/, this.botService.onLocation(ctx)];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
@@ -249,97 +165,11 @@ var BotUpdate = /** @class */ (function () {
             });
         });
     };
-    BotUpdate.prototype.hearsHelp = function (ctx) {
+    BotUpdate.prototype.onClickAnyLocation = function (ctx) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, ctx.replyWithHTML("\n        <b>start</b> - botni ishga tushirish\n<b>stop</b> - botni to'xtatish\n<b>start</b> - ushbu buyruqlarni ko'rsatish\n\n            ")];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    BotUpdate.prototype.inline = function (ctx) {
-        return __awaiter(this, void 0, void 0, function () {
-            var inlineKeyboard;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        inlineKeyboard = [
-                            [
-                                {
-                                    text: "Button 1",
-                                    callback_data: "button1"
-                                },
-                                {
-                                    text: "Button 2",
-                                    callback_data: "button2"
-                                },
-                                {
-                                    text: "Button 3",
-                                    callback_data: "button3"
-                                },
-                            ],
-                            [
-                                {
-                                    text: "Button 4",
-                                    callback_data: "button4"
-                                },
-                                {
-                                    text: "Button 5",
-                                    callback_data: "button5"
-                                },
-                            ],
-                            [
-                                {
-                                    text: "Button 6",
-                                    callback_data: "button6"
-                                },
-                            ],
-                        ];
-                        return [4 /*yield*/, ctx.reply("Kerakli inline buttonni tanla: ", {
-                                reply_markup: {
-                                    inline_keyboard: inlineKeyboard
-                                }
-                            })];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    BotUpdate.prototype.onClickAnyButton = function (ctx) {
-        return __awaiter(this, void 0, void 0, function () {
-            var buttonData;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        buttonData = ctx.callbackQuery.chat_instance;
-                        return [4 /*yield*/, ctx.reply("Ixtiyoriy " + buttonData + " Button  tugmasi bosildi!")];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    BotUpdate.prototype.mainButtons = function (ctx) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, ctx.reply("Kerakli Main Buttonni tanla:", __assign({ parse_mode: "HTML" }, telegraf_1.Markup.keyboard([
-                            ["bir", "ikki", "uch"],
-                            ["to'rt", "besh"],
-                            ["boshqa"],
-                            [telegraf_1.Markup.button.contactRequest("📱Telefon raqamni yuboring")],
-                            [telegraf_1.Markup.button.locationRequest("📍 Lokatsiyani yuboring")],
-                            [telegraf_1.Markup.button.game("🎮 oyinni yuboring")],
-                        ])
-                            .resize()
-                            .oneTime()))];
+                    case 0: return [4 /*yield*/, this.botService.onClickAnyLocation(ctx)];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
@@ -351,34 +181,11 @@ var BotUpdate = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        console.log(ctx);
-                        if (!("text" in ctx.message)) return [3 /*break*/, 4];
-                        if (!(ctx.message.text == "salom")) return [3 /*break*/, 2];
-                        return [4 /*yield*/, ctx.replyWithHTML("<b>Hello </b>👋👋👋")];
+                    case 0: return [4 /*yield*/, this.botService.onText(ctx)];
                     case 1:
-                        _a.sent();
-                        return [3 /*break*/, 4];
-                    case 2: return [4 /*yield*/, ctx.replyWithHTML("<i>" + ctx.message.text + "</i>")];
-                    case 3:
-                        _a.sent();
-                        _a.label = 4;
-                    case 4: return [4 /*yield*/, this.botService.onText(ctx)];
-                    case 5:
                         _a.sent();
                         return [2 /*return*/];
                 }
-            });
-        });
-    };
-    BotUpdate.prototype.onMessage = function (ctx) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                console.log(ctx.botInfo);
-                console.log(ctx.chat);
-                console.log(ctx.from);
-                console.log(ctx.from.first_name);
-                return [2 /*return*/];
             });
         });
     };
@@ -387,69 +194,37 @@ var BotUpdate = /** @class */ (function () {
         __param(0, nestjs_telegraf_1.Ctx())
     ], BotUpdate.prototype, "onStart");
     __decorate([
-        nestjs_telegraf_1.On("photo"),
-        __param(0, nestjs_telegraf_1.Ctx())
-    ], BotUpdate.prototype, "onPhoto");
-    __decorate([
-        nestjs_telegraf_1.On("video"),
-        __param(0, nestjs_telegraf_1.Ctx())
-    ], BotUpdate.prototype, "onVideo");
-    __decorate([
-        nestjs_telegraf_1.On("sticker"),
-        __param(0, nestjs_telegraf_1.Ctx())
-    ], BotUpdate.prototype, "onSticker");
-    __decorate([
-        nestjs_telegraf_1.On("animation"),
-        __param(0, nestjs_telegraf_1.Ctx())
-    ], BotUpdate.prototype, "onAnimation");
-    __decorate([
         nestjs_telegraf_1.On("contact"),
         __param(0, nestjs_telegraf_1.Ctx())
     ], BotUpdate.prototype, "onContact");
+    __decorate([
+        nestjs_telegraf_1.Command("stop"),
+        __param(0, nestjs_telegraf_1.Ctx())
+    ], BotUpdate.prototype, "onStop");
+    __decorate([
+        nestjs_telegraf_1.Command("address"),
+        __param(0, nestjs_telegraf_1.Ctx())
+    ], BotUpdate.prototype, "onAdress");
+    __decorate([
+        nestjs_telegraf_1.Hears("Yangi manzil qo'shish"),
+        __param(0, nestjs_telegraf_1.Ctx())
+    ], BotUpdate.prototype, "addNewAddress");
+    __decorate([
+        nestjs_telegraf_1.Hears("Mening manzillarim"),
+        __param(0, nestjs_telegraf_1.Ctx())
+    ], BotUpdate.prototype, "showAddresses");
     __decorate([
         nestjs_telegraf_1.On("location"),
         __param(0, nestjs_telegraf_1.Ctx())
     ], BotUpdate.prototype, "onLocation");
     __decorate([
-        nestjs_telegraf_1.On("voice"),
+        nestjs_telegraf_1.Action(/location_+[1-9]/),
         __param(0, nestjs_telegraf_1.Ctx())
-    ], BotUpdate.prototype, "onVoice");
-    __decorate([
-        nestjs_telegraf_1.On("invoice"),
-        __param(0, nestjs_telegraf_1.Ctx())
-    ], BotUpdate.prototype, "onInVoice");
-    __decorate([
-        nestjs_telegraf_1.On("document"),
-        __param(0, nestjs_telegraf_1.Ctx())
-    ], BotUpdate.prototype, "onDocument");
-    __decorate([
-        nestjs_telegraf_1.Hears("hi"),
-        __param(0, nestjs_telegraf_1.Ctx())
-    ], BotUpdate.prototype, "hearsHi");
-    __decorate([
-        nestjs_telegraf_1.Command("help"),
-        __param(0, nestjs_telegraf_1.Ctx())
-    ], BotUpdate.prototype, "hearsHelp");
-    __decorate([
-        nestjs_telegraf_1.Command("inline"),
-        __param(0, nestjs_telegraf_1.Ctx())
-    ], BotUpdate.prototype, "inline");
-    __decorate([
-        nestjs_telegraf_1.Action(/button+[1-9]/),
-        __param(0, nestjs_telegraf_1.Ctx())
-    ], BotUpdate.prototype, "onClickAnyButton");
-    __decorate([
-        nestjs_telegraf_1.Command("main"),
-        __param(0, nestjs_telegraf_1.Ctx())
-    ], BotUpdate.prototype, "mainButtons");
+    ], BotUpdate.prototype, "onClickAnyLocation");
     __decorate([
         nestjs_telegraf_1.On("text"),
         __param(0, nestjs_telegraf_1.Ctx())
     ], BotUpdate.prototype, "onText");
-    __decorate([
-        nestjs_telegraf_1.On("message"),
-        __param(0, nestjs_telegraf_1.Ctx())
-    ], BotUpdate.prototype, "onMessage");
     BotUpdate = __decorate([
         nestjs_telegraf_1.Update()
     ], BotUpdate);

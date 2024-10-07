@@ -14,13 +14,11 @@ export class BotService {
         @InjectModel(Bot) private botModel: typeof Bot,
         @InjectModel(Address) private addressModel: typeof Address,
         @InjectBot(BOT_NAME) private bot: Telegraf<Context>
-    ) {}
+    ) { }
 
     async start(ctx: Context) {
         const userId = ctx.from.id;
-        const user = await this.botModel.findOne({
-            where: { userId: userId },
-        });
+        const user = await this.botModel.findByPk(userId)
         if (!user) {
             await this.botModel.create({
                 userId: userId,
@@ -75,9 +73,7 @@ export class BotService {
     async onContact(ctx: Context) {
         if ("contact" in ctx.message) {
             const userId = ctx.from.id;
-            const user = await this.botModel.findOne({
-                where: { userId: userId },
-            });
+            const user = await this.botModel.findByPk(userId);
             if (!user) {
                 await ctx.reply(`Itimos, Start tugmasini bosing`, {
                     parse_mode: "HTML",
@@ -110,7 +106,7 @@ export class BotService {
                     { where: { userId: userId } }
                 );
                 await ctx.reply(
-                    `Raqam ${ctx.message.contact.phone_number} o'zgartirildi`,
+                    `Raqam ${ctx.message.contact.phone_number} ga o'zgartirildi`,
                     { parse_mode: "HTML" }
                 );
                 await ctx.reply(`Siz faollashtirildingiz`, {
@@ -164,7 +160,7 @@ export class BotService {
             });
         } else {
             await this.addressModel.create({
-                user_id: userId,
+                userId: userId,
                 last_state: "address_name",
             });
 
@@ -188,7 +184,7 @@ export class BotService {
                 });
             } else {
                 const address = await this.addressModel.findOne({
-                    where: { user_id: userId },
+                    where: { userId: userId },
                     order: [["id", "DESC"]],
                 });
                 if (address) {
@@ -212,32 +208,115 @@ export class BotService {
                                         "Lokatsiyani yuborish"
                                     ),
                                 ],
-                            ]),
+                            ]).resize(),
                         });
                     }
                 }
             }
         }
     }
+
+
+    async onLocation(ctx: Context) {
+        if ("location" in ctx.message) {
+            console.log(ctx.message.location)
+
+            const userId = ctx.from.id;
+            const user = await this.botModel.findByPk(userId);
+            if (!user) {
+                await ctx.reply(`Siz avval ro'yxatdan o'tmagansiz`, {
+                    parse_mode: "HTML",
+                    ...Markup.keyboard([["/start"]])
+                        .resize()
+                        .oneTime(),
+                });
+            } else {
+                const address = await this.addressModel.findOne({
+                    where: { userId: userId },
+                    order: [["id", "DESC"]],
+                });
+                if (address) {
+                    if (address.last_state == "location") {
+                        address.location = `${ctx.message.location.latitude}, ${ctx.message.location.longitude}`;
+                        address.last_state = "finish";
+                        await address.save();
+                        await ctx.reply(`Manzilni qo'shildi.`, {
+                            parse_mode: "HTML",
+                            ...Markup.removeKeyboard(),
+                        });
+                    }
+                }
+            }
+            // await ctx.reply(String(ctx.message.location.latitude));
+            // await ctx.reply(String(ctx.message.location.longitude));
+
+        }
+    }
+
+    async showAddresses(ctx: Context) {
+        const userId = ctx.from.id;
+        const user = await this.botModel.findByPk(userId);
+        if (!user) {
+            await ctx.reply(`Siz avval ro'yxatdan o'tmagansiz`, {
+                parse_mode: "HTML",
+                ...Markup.keyboard([["/start"]])
+                    .resize()
+                    .oneTime(),
+            });
+        } else {
+            const addresses = await this.addressModel.findAll({
+                where: { userId: userId }
+            });
+
+            addresses.forEach(async (address) => {
+                await ctx.replyWithHTML(`<b>Manzil nomi:</b> ${address.address_name}\n<b>Manzil:</b> ${address.address}`,
+                    {
+                        reply_markup: {
+                            inline_keyboard: [[{ text: "Lokatsiyani ko'rish", callback_data: `location_${address.id}` }]]
+                        }
+                    }
+                );
+            })
+        }
+    }
+
+    async onClickAnyLocation(ctx: Context) {
+        try {
+            const actText: String = ctx.callbackQuery["data"];
+            const address_id = Number(actText.split("_")[1]);
+            const address = await this.addressModel.findByPk(address_id);
+            await ctx.replyWithLocation(
+                Number(address.location.split(",")[0]),
+                Number(address.location.split(",")[1])
+            )
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+
+    // const actText:String = ctx.callbackQuery['data'];
+    //     const button_id = Number(actText.split("_")[1]);
+    //     await ctx.reply(`${button_id} - tugma bosildi.`);
     // try {
-        
+
     // } catch (error) {
-        
+
     // }
 
     // async sendOtp(phone_number: string, OTP: string):Promise<boolean> {
     //     const user = this.botModel.findOne({ where: { phone_number } });
-    //     if (!user || !user.status) {
+    //     if (!user || !user.last_state) {
     //         return false
     //     }
-    
+
 
     //     await this.bot.telegram.sendMessage(user.userId, )
     // }
 
 
 
-    
+
 
 
 }
