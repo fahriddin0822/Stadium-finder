@@ -31,6 +31,7 @@ import { OtpModule } from './otp/otp.module';
 import { OTP } from "./otp/models/otp.model";
 import { UserWallet } from "./user_wallet/models/user_wallet.model";
 import { OwnerModule } from './owner/owner.module';
+import { SmsModule } from './sms/sms.module';
 
 @Module({
     imports: [
@@ -84,6 +85,7 @@ import { OwnerModule } from './owner/owner.module';
         BotModule,
         OtpModule,
         OwnerModule,
+        SmsModule,
     ],
     controllers: [],
     providers: [],
